@@ -9,7 +9,6 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private Connection connection = Util.getSQLConnection();
-    private long generatedKey = 0;
 
     public UserDaoJDBCImpl() throws SQLException {
 
@@ -46,15 +45,11 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         final String SQL_SAVE_USER = "INSERT INTO Users (NAME, LASTNAME, AGE) VALUE(?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_SAVE_USER, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_SAVE_USER)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
-            ResultSet rs = preparedStatement.getGeneratedKeys();
-            if (rs.next()) {
-                generatedKey = new Long(rs.getLong(1));
-            }
             System.out.println("User с именем - " + name + " добавлен в базу данных");
         } catch (SQLException e) {
             System.err.format(e.getMessage());
@@ -62,9 +57,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try {
-            final String SQL_REMOVE_USER = "DELETE FROM Users WHERE id=?";
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_REMOVE_USER);
+        final String SQL_REMOVE_USER = "DELETE FROM Users WHERE id=?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_REMOVE_USER)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -91,8 +85,11 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        for (int i = 0; i < generatedKey + 1; i++) {
-            removeUserById(i);
+        final String SQL_REMOVE_ALL = "DELETE FROM Users";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_REMOVE_ALL)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.format(e.getMessage());
         }
     }
 }
