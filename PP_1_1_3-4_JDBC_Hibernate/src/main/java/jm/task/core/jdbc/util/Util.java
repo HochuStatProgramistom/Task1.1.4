@@ -16,6 +16,11 @@ public class Util {
     private static final String URL = "jdbc:mysql://localhost:3306/task_1";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static final String DIALECT = "org.hibernate.dialect.MySQL5Dialect";
+    private static final String SHOW_SQL = "true";
+    private static final String CURRENT_SESSION_CONTEXT_CLASS = "thread";
+    private static final String HBM2DDL_AUTO = "update";
 
     public static Connection getSQLConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
@@ -28,14 +33,14 @@ public class Util {
             try {
                 Configuration configuration = new Configuration();
                 Properties settings = new Properties();
-                settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-                settings.put(Environment.URL, "jdbc:mysql://localhost:3306/task_1?useSSL=false");
-                settings.put(Environment.USER, "root");
-                settings.put(Environment.PASS, "root");
-                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
-                settings.put(Environment.SHOW_SQL, "true");
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-                settings.put(Environment.HBM2DDL_AUTO, "update");
+                settings.put(Environment.DRIVER, DRIVER);
+                settings.put(Environment.URL, URL);
+                settings.put(Environment.USER, USERNAME);
+                settings.put(Environment.PASS, PASSWORD);
+                settings.put(Environment.DIALECT, DIALECT);
+                settings.put(Environment.SHOW_SQL, SHOW_SQL);
+                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, CURRENT_SESSION_CONTEXT_CLASS);
+                settings.put(Environment.HBM2DDL_AUTO, HBM2DDL_AUTO);
                 configuration.setProperties(settings);
                 configuration.addAnnotatedClass(User.class);
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

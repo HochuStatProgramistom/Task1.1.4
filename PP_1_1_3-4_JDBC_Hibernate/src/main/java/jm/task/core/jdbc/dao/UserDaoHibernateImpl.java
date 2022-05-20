@@ -54,6 +54,15 @@ public class UserDaoHibernateImpl implements UserDao {
             if (!e.getMessage().equals("Unknown table 'task_1.users'")) {
                 System.err.format(e.getMessage());
             }
+            try {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+            } catch (Exception tException) {
+                if (!tException.getMessage().equals("Unknown table 'task_1.users'")) {
+                    System.err.format(e.getMessage());
+                }
+            }
         }
     }
 
@@ -92,11 +101,16 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
+        Transaction transaction = null;
         List<User> usersList = new ArrayList<>();
         try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             usersList = session.createQuery("FROM User").list();
+            transaction.commit();
         } catch (Exception e) {
-            System.err.format(e.getMessage());
+            if (transaction != null) {
+                transaction.rollback();
+            }
         }
         return usersList;
     }
